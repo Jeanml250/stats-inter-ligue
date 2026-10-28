@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['*.tsv', '*.mjs', 'rapport-modele.html', '.github/workflows/**']
+    paths: ['*.tsv', '*.mjs', 'rapport-modele.html', '*.pdf', '.github/workflows/**']
 
 permissions:
   contents: write

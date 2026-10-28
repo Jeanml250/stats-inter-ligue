@@ -64,6 +64,7 @@
     <li>Ajouter un tournoi ou une ligue manuellement</li>
     <li>Noms écrits différemment</li>
     <li>Homonymes : même nom, personnes différentes</li>
+    <li>Sur iPhone et iPad : la version en ligne</li>
     <li>Limites connues et dépannage</li>
   </ol>
 
@@ -83,8 +84,8 @@
     <li>un <b>fichier Excel</b> (format CSV) avec une ligne par joueur et par équipe;</li>
     <li>une <b>recherche par joueur</b> directement dans le Terminal.</li>
   </ul>
-  <div class="encadre">Le logiciel fonctionne entièrement sur votre Mac. Il ne fait que <b>lire</b> les pages publiques de résultats :
-  aucun compte, aucun mot de passe, rien n'est envoyé nulle part.</div>
+  <div class="encadre">Le logiciel ne fait que <b>lire</b> les pages publiques de résultats de Lexer. Il fonctionne de deux façons :
+  <b>en ligne</b>, mis à jour chaque nuit et consultable sur iPhone, iPad ou n'importe quel ordinateur (section 12), ou <b>sur le Mac</b> (section 3).</div>
 
   <h2 style="margin-top:18pt">2. Contenu du dossier</h2>
   <table>
@@ -389,7 +390,46 @@ Richard Lapointe	Bottines Roulantes, Métaux Multi-Plis, Pierrafeux</span>
 </section>
 
 <section>
-  <h2>12. Limites connues et dépannage</h2>
+  <h2>12. Sur iPhone et iPad : la version en ligne</h2>
+  <p>Le logiciel est aussi installé sur <b>GitHub</b>, un service gratuit qui l'exécute automatiquement <b>chaque nuit vers 4 h</b>
+  et publie le rapport à une adresse fixe. Le Mac n'a pas besoin d'être allumé.</p>
+  <div class="encadre"><b>Adresse du rapport :</b> <code>https://jeanml250.github.io/stats-inter-ligue/</code></div>
+
+  <h3>Ajouter le rapport à l'écran d'accueil</h3>
+  <ol class="etapes">
+    <li>Sur l'iPhone ou l'iPad, ouvrez l'adresse ci-dessus dans <b>Safari</b>.</li>
+    <li>Touchez le bouton <b>Partager</b> (le carré avec une flèche vers le haut), puis <b>Sur l'écran d'accueil</b>.</li>
+    <li>Une icône bleue <b>« IL STATS »</b> apparaît. Elle ouvre le rapport comme une app.</li>
+  </ol>
+  <p>Le rapport s'utilise exactement comme sur le Mac (sections 4 et 5). Sur un petit écran, les grands tableaux défilent horizontalement avec le doigt.
+  En bas de la page, des liens permettent de télécharger les fichiers Excel et ce guide. La date de la dernière mise à jour est affichée sous le titre.</p>
+
+  <h3>Mettre à jour sans attendre la nuit</h3>
+  <p>Après un tournoi, vous pouvez lancer la mise à jour tout de suite, depuis l'iPhone, l'iPad ou un ordinateur :</p>
+  <ol class="etapes">
+    <li>Ouvrez <code>github.com/Jeanml250/stats-inter-ligue</code> et connectez-vous à votre compte GitHub.</li>
+    <li>Touchez l'onglet <b>Actions</b>, puis <b>Mise à jour</b> dans la liste de gauche (ou dans le menu sur iPhone).</li>
+    <li>Touchez <b>Run workflow</b>, puis le bouton vert <b>Run workflow</b>.</li>
+  </ol>
+  <p>Le rapport en ligne est à jour 3 à 5 minutes plus tard. Rechargez la page pour le voir.</p>
+
+  <h3>Modifier les correspondances, les homonymes ou les événements</h3>
+  <p>Les fichiers <code>correspondances.tsv</code>, <code>homonymes.tsv</code> et <code>evenements.tsv</code> se modifient directement sur github.com :</p>
+  <ol class="etapes">
+    <li>Sur la page du dépôt, touchez le nom du fichier, puis l'icône en forme de <b>crayon</b> (Edit).</li>
+    <li>Ajoutez votre ligne. Séparez les éléments par une <b>tabulation</b> : sur iPhone ou iPad, le plus simple est de copier une ligne
+    existante et d'en remplacer le texte.</li>
+    <li>Touchez <b>Commit changes</b>, puis confirmez. La mise à jour se relance automatiquement.</li>
+  </ol>
+  <div class="encadre attention"><b>Deux copies.</b> Les fichiers sur GitHub et ceux du dossier du Mac sont des copies séparées.
+  La version en ligne utilise ceux de GitHub. Si vous utilisez aussi le logiciel sur le Mac, faites les mêmes changements aux deux endroits,
+  ou utilisez seulement la version en ligne.</div>
+  <div class="encadre attention"><b>Page publique.</b> Le rapport en ligne n'est pas protégé par un mot de passe : toute personne qui connaît
+  l'adresse peut le consulter. Les résultats eux-mêmes sont déjà publics sur Lexer.</div>
+</section>
+
+<section>
+  <h2>13. Limites connues et dépannage</h2>
   <h3>Pourquoi certains joueurs n'ont pas de moyenne de référence?</h3>
   <ul>
     <li><b>Inter Ligue Finale 2024</b> : ce tournoi a été joué en avril 2024 (saison 2023-2024). Les ligues ne sont publiées sur Lexer qu'à partir
