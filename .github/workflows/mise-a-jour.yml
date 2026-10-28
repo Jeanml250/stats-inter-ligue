@@ -1,0 +1,71 @@
+# Met à jour les statistiques chaque nuit et publie le rapport sur GitHub Pages.
+# Se relance aussi à chaque modification de correspondances.tsv, homonymes.tsv ou
+# evenements.tsv, et à la demande (onglet Actions → « Mise à jour » → Run workflow).
+name: Mise à jour
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # 4 h du matin, heure du Québec (été)
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['*.tsv', '*.mjs', 'rapport-modele.html', '.github/workflows/**']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: mise-a-jour
+  cancel-in-progress: false
+
+jobs:
+  mise-a-jour:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publication.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Pages Lexer déjà lues lors des passages précédents
+      - uses: actions/cache@v4
+        with:
+          path: cache
+          key: lexer-${{ github.run_id }}
+          restore-keys: lexer-
+
+      - name: Extraire les tournois et calculer les moyennes
+        run: node extraire.mjs
+        env:
+          TZ: America/Toronto
+
+      # Les nouveaux tournois trouvés automatiquement sont ajoutés à evenements.tsv
+      - name: Enregistrer les nouveaux événements
+        run: |
+          if ! git diff --quiet evenements.tsv; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Nouveaux événements trouvés" evenements.tsv
+            git push
+          fi
+
+      - name: Préparer le site
+        run: |
+          mkdir -p _site
+          cp resultats/rapport.html _site/index.html
+          cp resultats/participations.csv resultats/noms-a-verifier.csv _site/
+          cp Guide-utilisateur-Stats-Inter-Ligue.pdf _site/guide.pdf
+          cp icone.png _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: publication
+        uses: actions/deploy-pages@v4

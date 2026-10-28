@@ -1,0 +1,12 @@
+# Généré par node extraire.mjs (en ligne, par GitHub Actions)
+cache/
+resultats/
+_site/
+
+# Documents personnels, hors du logiciel
+*.pages
+*.xlsx
+guide/Fichier des directives*.pdf
+guide/Guide-utilisateur*.pdf
+
+.DS_Store

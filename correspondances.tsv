@@ -1,0 +1,12 @@
+# Correspondances de noms : quand un joueur est écrit différemment au tournoi et dans sa ligue.
+# Une ligne par joueur : nom tel qu'écrit au tournoi, une TABULATION, nom tel qu'écrit dans la ligue.
+# Laisser le nom en ligue vide pour empêcher le rapprochement automatique d'un joueur.
+# Les lignes qui commencent par # sont ignorées. Exemples :
+# Chrisitan Mercier	Christian Mercier
+# Richard Lapointe (Bot)	Richard Lapointe
+# Claude Aubin (Ret)	
+Frederick Pinault	Frederick Pineault
+Jesson Levaseur	Jessen Levasseur
+Keven Lessard	Kevin Lessard
+Pierre Cote	Pierre Cote (copain du Jeudi)
+Pierre Cote (PT)	Pierre Cote (Passe-temps)

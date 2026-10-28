@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Statistiques Inter Ligue</title>
+<meta name="apple-mobile-web-app-title" content="Stats IL">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icone.png">
+<style>
+  :root {
+    --fond: #f6f5f2; --carte: #ffffff; --texte: #1d1d1f; --doux: #6b6b70; --ligne: #e3e1dc;
+    --accent: #1f5fae; --accent-fond: #e8f0fa; --plus: #1d7a3e; --moins: #b3261e; --zebre: #fafaf8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fond: #161618; --carte: #1f1f22; --texte: #ececee; --doux: #9a9aa2; --ligne: #333338;
+      --accent: #6ea8ff; --accent-fond: #1d2a3d; --plus: #5cc98a; --moins: #ff8a80; --zebre: #232326; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--texte); font: 15px/1.45 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1600px; margin: auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sous { color: var(--doux); font-size: 13px; }
+  nav { display: flex; gap: 6px; padding: 8px 16px; max-width: 1600px; margin: auto; }
+  nav button { border: 1px solid var(--ligne); background: var(--carte); color: var(--texte); padding: 8px 16px; border-radius: 8px; font: inherit; cursor: pointer; }
+  nav button.actif { background: var(--accent); border-color: var(--accent); color: #fff; }
+  main { max-width: 1600px; margin: auto; padding: 8px 16px 40px; }
+  .carte { background: var(--carte); border: 1px solid var(--ligne); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+  .barre { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+  select, input[type=search] { font: inherit; padding: 7px 10px; border: 1px solid var(--ligne); border-radius: 8px; background: var(--carte); color: var(--texte); }
+  input[type=search] { min-width: 240px; flex: 1; max-width: 420px; }
+  label.case { display: flex; gap: 6px; align-items: center; color: var(--doux); font-size: 14px; }
+  .chiffres { display: flex; flex-wrap: wrap; gap: 22px; }
+  .chiffres div b { display: block; font-size: 20px; }
+  .chiffres div span { color: var(--doux); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  .defile { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--ligne); text-align: left; white-space: nowrap; }
+  th { font-size: 12px; color: var(--doux); font-weight: 600; cursor: pointer; user-select: none; background: var(--carte); }
+  th.tri::after { content: " ▾"; } th.tri.asc::after { content: " ▴"; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:nth-child(even) { background: var(--zebre); }
+  .plus { color: var(--plus); } .moins { color: var(--moins); }
+  .note { color: var(--doux); font-size: 12px; }
+  a.j { color: var(--accent); text-decoration: none; cursor: pointer; } a.j:hover { text-decoration: underline; }
+  .equipe-titre { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; margin: 0 0 6px; }
+  .equipe-titre h3 { margin: 0; font-size: 16px; }
+  .alerte { color: var(--moins); }
+  .rapproche { color: #a15c00; }
+  .suggestions { border: 1px solid var(--ligne); border-radius: 8px; max-height: 320px; overflow: auto; background: var(--carte); margin-bottom: 14px; }
+  .suggestions div { padding: 6px 10px; cursor: pointer; } .suggestions div:hover { background: var(--accent-fond); }
+  .vide { color: var(--doux); padding: 20px 0; }
+  footer { max-width: 1600px; margin: auto; padding: 0 16px 30px; color: var(--doux); font-size: 13px; }
+  footer a { color: var(--accent); }
+  /* iPhone / iPad en portrait */
+  @media (max-width: 700px) {
+    body { font-size: 14px; }
+    header { padding: 14px 12px 4px; } h1 { font-size: 19px; }
+    nav { padding: 8px 12px; } nav button { flex: 1; padding: 9px 6px; }
+    main { padding: 8px 12px 30px; }
+    .carte { padding: 10px; border-radius: 8px; }
+    .chiffres { gap: 12px 18px; } .chiffres div b { font-size: 17px; }
+    input[type=search] { min-width: 0; flex: 1 1 100%; max-width: none; }
+    select { width: 100%; }
+    /* 16 px évite le zoom automatique de Safari sur les champs */
+    select, input[type=search] { font-size: 16px; }
+    table { font-size: 13px; } th, td { padding: 5px 6px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Statistiques des tournois Inter Ligue</h1>
+  <div class="sous" id="sous"></div>
+</header>
+<nav>
+  <button data-vue="tournois" class="actif">Tournois</button>
+  <button data-vue="joueur">Joueur</button>
+  <button data-vue="regle">Méthode</button>
+</nav>
+<main id="vue"></main>
+<footer id="liens" hidden>Télécharger : <a href="participations.csv">toutes les participations (Excel)</a> ·
+  <a href="noms-a-verifier.csv">noms à vérifier (Excel)</a> · <a href="guide.pdf">guide de l'utilisateur (PDF)</a></footer>
+
+<script>
+const D = /*DONNEES*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const f2 = v => v == null ? '—' : v.toFixed(2).replace('.', ',');
+const dateTxt = n => { if (!n) return '—'; const a = Math.floor(n / 10000), m = Math.floor(n / 100) % 100, j = n % 100;
+  return new Date(a, m - 1, j).toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', year: 'numeric' }); };
+const signe = v => v == null ? '—' : `<span class="${v >= 0 ? 'plus' : 'moins'}">${v >= 0 ? '+' : ''}${f2(v)}</span>`;
+const signeEntier = v => v == null ? '—' : `<span class="${v >= 0 ? 'plus' : 'moins'}">${v >= 0 ? '+' : ''}${v}</span>`;
+const refEnt = r => r ? Math.floor(r.moy) : null;
+const lienJ = (cle, nom) => `<a class="j" data-cle="${esc(cle)}">${esc(nom)}</a>`;
+const refSource = r => r ? `${esc(r.ligue)} <span class="note">${esc(r.saison)} · ${r.parties} p. · ${esc(r.methode)}</span>`
+  + (r.nomLigue ? `<br><span class="note ${r.rapprochement === 'automatique' ? 'rapproche' : ''}">≈ en ligue sous le nom « ${esc(r.nomLigue)} » (${r.rapprochement === 'automatique' ? 'rapprochement automatique, à vérifier' : 'correspondance manuelle'})</span>` : '')
+  : '<span class="alerte">introuvable</span>';
+const sansAccent = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+const tournois = D.tournois.slice().reverse();
+const nomsJoueurs = new Map();
+for (const t of D.tournois) for (const e of t.equipes) for (const j of e.joueurs) nomsJoueurs.set(j.cle, j.nom);
+const nbPart = D.tournois.reduce((n, t) => n + t.equipes.reduce((m, e) => m + e.joueurs.length, 0), 0);
+$('#sous').textContent = `Salon de Quilles Montmorency · ${D.tournois.length} tournois · ${nomsJoueurs.size} joueurs · ${nbPart} participations · données du ${new Date(D.genere).toLocaleString('fr-CA')}`;
+
+const etat = { vue: 'tournois', tournoi: tournois[0]?.slug, parEquipe: false, filtre: '', tri: { col: 'ecart', asc: false }, joueur: null, recherche: '' };
+try { Object.assign(etat, JSON.parse(localStorage.getItem('stats-il') || '{}')); } catch {}
+const garder = () => { try { localStorage.setItem('stats-il', JSON.stringify({ vue: etat.vue, tournoi: etat.tournoi, parEquipe: etat.parEquipe, joueur: etat.joueur })); } catch {} };
+
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => { etat.vue = b.dataset.vue; rendre(); });
+document.addEventListener('click', e => { const a = e.target.closest('a.j'); if (a) { etat.joueur = a.dataset.cle; etat.vue = 'joueur'; rendre(); window.scrollTo(0, 0); } });
+
+function rendre() {
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('actif', b.dataset.vue === etat.vue));
+  garder();
+  ({ tournois: vueTournois, joueur: vueJoueur, regle: vueRegle })[etat.vue]();
+}
+
+// ----- Vue Tournois -----
+
+function joueursDuTournoi(t) {
+  const m = new Map();
+  for (const e of t.equipes) for (const j of e.joueurs) {
+    if (!m.has(j.cle)) m.set(j.cle, { cle: j.cle, nom: j.nom, ref: j.ref, parties: 0, qa: 0, equipes: [], ligues: new Set() });
+    const x = m.get(j.cle);
+    x.parties += j.parties.length; x.qa += j.qa; x.equipes.push(e); x.ligues.add(e.ligue);
+  }
+  return [...m.values()].map(x => ({ ...x, moy: x.qa / x.parties, refE: refEnt(x.ref), ecart: x.ref ? x.qa / x.parties - refEnt(x.ref) : null }));
+}
+
+function vueTournois() {
+  const t = tournois.find(t => t.slug === etat.tournoi) || tournois[0];
+  const js = joueursDuTournoi(t);
+  const avecRef = js.filter(j => j.ref);
+  const ecartMoy = avecRef.length ? avecRef.reduce((s, j) => s + j.ecart, 0) / avecRef.length : null;
+  const debut = dateTxt(t.debut), fin = dateTxt(t.fin);
+  $('#vue').innerHTML = `
+    <div class="barre">
+      <select id="choixT">${tournois.map(x => `<option value="${x.slug}" ${x.slug === t.slug ? 'selected' : ''}>${esc(x.nom)}</option>`).join('')}</select>
+      <input type="search" id="filtre" placeholder="Filtrer par joueur, équipe ou ligue…" value="${esc(etat.filtre)}">
+      <label class="case"><input type="checkbox" id="parEquipe" ${etat.parEquipe ? 'checked' : ''}> Regrouper par équipe</label>
+    </div>
+    <div class="carte chiffres">
+      <div><span>Date</span><b>${debut === fin ? debut : `${debut} au ${fin}`}</b></div>
+      <div><span>Équipes</span><b>${t.equipes.length}</b></div>
+      <div><span>Joueurs</span><b>${js.length}</b></div>
+      <div><span>Écart moyen (jouée − réf.)</span><b>${signe(ecartMoy)}</b></div>
+      <div><span>Sans moyenne de référence</span><b>${js.length - avecRef.length}</b></div>
+    </div>
+    <div class="carte" id="contenu"></div>`;
+  $('#choixT').onchange = e => { etat.tournoi = e.target.value; rendre(); };
+  $('#parEquipe').onchange = e => { etat.parEquipe = e.target.checked; rendre(); };
+  $('#filtre').oninput = e => { etat.filtre = e.target.value; dessinerContenu(t, js); };
+  dessinerContenu(t, js);
+}
+
+function dessinerContenu(t, js) {
+  const f = sansAccent(etat.filtre.trim());
+  if (etat.parEquipe) {
+    const eqs = t.equipes.slice().sort((a, b) => a.pos - b.pos)
+      .filter(e => !f || sansAccent(e.nom + ' ' + e.joueurs.map(j => j.nom).join(' ')).includes(f));
+    $('#contenu').innerHTML = eqs.map(e => {
+      const ecartEq = e.sommeRef != null ? e.sommeRef - e.moyDeclaree : null;
+      return `<div style="margin-bottom:18px">
+        <div class="equipe-titre"><h3>${e.pos}. ${esc(e.nom)}</h3>
+          <span class="note">${dateTxt(e.date)} ${esc(e.heure)} · parties ${e.parties.join(' / ')} · total ${e.qa} · moy. équipe déclarée ${e.moyDeclaree} · diff. ${signeEntier(e.diff)}
+          · somme des moy. de réf. ${e.sommeRef ?? '—'}${ecartEq ? ` <span class="alerte">(${ecartEq > 0 ? '+' : ''}${ecartEq} vs déclarée)</span>` : ''}</span></div>
+        <div class="defile"><table><thead><tr><th>Joueur</th><th>Parties</th><th class="n">Quilles</th><th class="n">Moy. réf.</th><th class="n">Moy. jouée</th><th class="n">Écart</th><th>Source de la référence</th></tr></thead><tbody>
+        ${e.joueurs.map(j => `<tr><td>${lienJ(j.cle, j.nom)}</td><td>${j.parties.join(' · ')}</td><td class="n">${j.qa}</td>
+          <td class="n">${refEnt(j.ref) ?? '—'}</td><td class="n">${f2(j.moy)}</td><td class="n">${signe(j.ref ? j.moy - refEnt(j.ref) : null)}</td><td>${refSource(j.ref)}</td></tr>`).join('')}
+        </tbody></table></div></div>`;
+    }).join('') || '<div class="vide">Aucune équipe.</div>';
+    return;
+  }
+  const cols = [
+    ['nom', 'Joueur', j => lienJ(j.cle, j.nom), false],
+    ['ligue', 'Ligue représentée', j => esc([...j.ligues].join(', ')), false],
+    ['equipe', 'Équipe(s)', j => j.equipes.map(e => `${esc(e.nom)} <span class="note">${e.pos}<sup>e</sup></span>`).join('<br>'), false],
+    ['parties', 'Parties', j => j.parties, true],
+    ['refE', 'Moy. réf.', j => j.refE ?? '—', true],
+    ['moy', 'Moy. jouée', j => f2(j.moy), true],
+    ['ecart', 'Écart', j => signe(j.ecart), true],
+    ['source', 'Source de la référence', j => refSource(j.ref), false],
+  ];
+  const cle = { nom: j => sansAccent(j.nom), ligue: j => sansAccent([...j.ligues].join()), equipe: j => j.equipes[0].pos, parties: j => j.parties,
+    refE: j => j.refE ?? -1e9, moy: j => j.moy, ecart: j => j.ecart ?? -1e9, source: j => sansAccent(j.ref?.ligue || '~') };
+  const k = cle[etat.tri.col], s = etat.tri.asc ? 1 : -1;
+  const garde = j => !f || sansAccent([j.nom, ...j.ligues, ...j.equipes.map(e => e.nom)].join(' ')).includes(f);
+  const liste = js.filter(garde).sort((a, b) => k(a) < k(b) ? -s : k(a) > k(b) ? s : 0);
+  $('#contenu').innerHTML = `<div class="defile"><table><thead><tr>${cols.map(([c, l, , n]) => `<th data-col="${c}" class="${n ? 'n ' : ''}${etat.tri.col === c ? 'tri' + (etat.tri.asc ? ' asc' : '') : ''}">${l}</th>`).join('')}</tr></thead>
+    <tbody>${liste.map(j => `<tr>${cols.map(([, , v, n]) => `<td class="${n ? 'n' : ''}">${v(j)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    ${liste.length ? '' : '<div class="vide">Aucun joueur ne correspond au filtre.</div>'}`;
+  document.querySelectorAll('#contenu th').forEach(th => th.onclick = () => {
+    const c = th.dataset.col;
+    etat.tri = { col: c, asc: etat.tri.col === c ? !etat.tri.asc : ['nom', 'ligue', 'equipe', 'source'].includes(c) };
+    dessinerContenu(t, js);
+  });
+}
+
+// ----- Vue Joueur -----
+
+function vueJoueur() {
+  $('#vue').innerHTML = `
+    <div class="barre"><input type="search" id="cherche" placeholder="Rechercher un joueur…" value="${esc(etat.recherche)}" autocomplete="off"></div>
+    <div id="sugg"></div><div id="fiche"></div>`;
+  const champ = $('#cherche');
+  champ.oninput = () => {
+    etat.recherche = champ.value;
+    const q = sansAccent(champ.value.trim());
+    if (!q) { $('#sugg').innerHTML = ''; return; }
+    const r = [...nomsJoueurs].filter(([, n]) => sansAccent(n).includes(q)).sort((a, b) => a[1].localeCompare(b[1], 'fr')).slice(0, 40);
+    $('#sugg').innerHTML = r.length ? `<div class="suggestions">${r.map(([c, n]) => `<div data-cle="${esc(c)}">${esc(n)}</div>`).join('')}</div>` : '<div class="vide">Aucun joueur trouvé.</div>';
+    $('#sugg').querySelectorAll('[data-cle]').forEach(d => d.onclick = () => { etat.joueur = d.dataset.cle; $('#sugg').innerHTML = ''; garder(); ficheJoueur(); });
+  };
+  if (etat.joueur) ficheJoueur(); else champ.focus();
+}
+
+function ficheJoueur() {
+  const lignes = [];
+  for (const t of tournois) for (const e of t.equipes) for (const j of e.joueurs) if (j.cle === etat.joueur) lignes.push({ t, e, j });
+  if (!lignes.length) { $('#fiche').innerHTML = ''; return; }
+  const parties = lignes.reduce((n, l) => n + l.j.parties.length, 0), qa = lignes.reduce((n, l) => n + l.j.qa, 0);
+  const avecRef = lignes.filter(l => l.j.ref);
+  const ecartMoy = avecRef.length ? avecRef.reduce((s, l) => s + l.j.moy - refEnt(l.j.ref), 0) / avecRef.length : null;
+  const ligues = [...new Set(lignes.map(l => l.e.ligue))];
+  $('#fiche').innerHTML = `
+    <div class="carte">
+      <h2 style="margin:0 0 10px">${esc(lignes[0].j.nom)}</h2>
+      <div class="chiffres">
+        <div><span>Tournois</span><b>${new Set(lignes.map(l => l.t.slug)).size}</b></div>
+        <div><span>Participations</span><b>${lignes.length}</b></div>
+        <div><span>Parties</span><b>${parties}</b></div>
+        <div><span>Moyenne jouée</span><b>${f2(qa / parties)}</b></div>
+        <div><span>Meilleure partie</span><b>${Math.max(...lignes.flatMap(l => l.j.parties))}</b></div>
+        <div><span>Écart moyen vs réf.</span><b>${signe(ecartMoy)}</b></div>
+      </div>
+      <p class="note" style="margin:10px 0 0">Ligue(s) représentée(s) : ${ligues.map(esc).join(', ')}</p>
+    </div>
+    <div class="carte defile"><table><thead><tr>
+      <th>Date</th><th>Tournoi</th><th>Équipe</th><th>Parties</th><th class="n">Moy. réf.</th><th class="n">Moy. jouée</th><th class="n">Écart</th><th>Source de la référence</th><th>Résultat de l'équipe</th>
+    </tr></thead><tbody>
+    ${lignes.map(({ t, e, j }) => `<tr>
+      <td>${dateTxt(e.date)}</td><td>${esc(t.nom)}</td><td>${esc(e.nom)}</td><td>${j.parties.join(' · ')}</td>
+      <td class="n">${refEnt(j.ref) ?? '—'}</td><td class="n">${f2(j.moy)}</td><td class="n">${signe(j.ref ? j.moy - refEnt(j.ref) : null)}</td>
+      <td>${refSource(j.ref)}${j.ref?.autres?.length ? `<br><span class="note">autres : ${esc(j.ref.autres.join(', '))}</span>` : ''}</td>
+      <td>${e.pos}<sup>e</sup> sur ${t.equipes.length} · ${e.qa} quilles · moy. équipe ${e.moyDeclaree} · diff. ${signeEntier(e.diff)}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+// ----- Vue Méthode -----
+
+function vueRegle() {
+  $('#vue').innerHTML = `<div class="carte" style="max-width:760px">
+    <h2 style="margin-top:0">Comment la moyenne de référence est calculée</h2>
+    <p>Lexer ne publie pas la moyenne déclarée de chaque joueur, seulement celle de l'équipe. La moyenne de référence d'un joueur est donc recherchée dans les ligues du Salon de Quilles Montmorency publiées sur Lexer :</p>
+    <ol>
+      <li>Pour chaque ligue de la saison en cours au moment du tournoi, on calcule la moyenne cumulative du joueur <b>avant la première journée du tournoi</b>, à partir de sa fiche semaine par semaine.</li>
+      <li>On ne retient que les ligues où il avait <b>au moins ${D.minParties} parties</b> à cette date, et on garde <b>la plus haute</b>.</li>
+      <li>Si aucune ligue de la saison en cours n'atteint ${D.minParties} parties, on prend la plus haute moyenne finale de la <b>saison précédente</b> (minimum ${D.minParties} parties).</li>
+      <li>La moyenne retenue est tronquée à l'entier, comme une moyenne de ligue. Écart = moyenne jouée au tournoi − moyenne de référence.</li>
+    </ol>
+    <p>Contrôle : en vue « Regrouper par équipe », la somme des moyennes de référence des joueurs est comparée à la moyenne déclarée de l'équipe, et les écarts sont signalés en rouge.</p>
+    <h3>Noms écrits différemment</h3>
+    <p>Les joueurs sont reliés par leur nom, sans tenir compte des accents ni des majuscules. Quand un nom du tournoi n'existe pas tel quel dans les ligues, le logiciel cherche un nom très proche (une ou deux lettres de différence), de préférence dans la ligue que représente l'équipe. Il ne le retient que s'il n'y a qu'un seul candidat. Ces cas sont marqués <span class="rapproche">≈ rapprochement automatique, à vérifier</span>.</p>
+    <p>Pour corriger ou compléter, inscrivez le nom au tournoi et le nom en ligue dans le fichier <b>correspondances.tsv</b>, puis relancez la mise à jour. La liste des cas à vérifier est dans <b>resultats/noms-a-verifier.csv</b>.</p>
+    <h3>Homonymes</h3>
+    <p>Un même nom présent dans plusieurs ligues est considéré comme une seule personne, sauf s'il est déclaré dans le fichier <b>homonymes.tsv</b> (une ligne par personne : le nom et ses ligues). Le joueur du tournoi est alors rattaché à la personne dont une ligue correspond à son équipe, et il a sa propre fiche, affichée « Nom [ligues] ».</p>
+    <p>Les homonymes probables (deux ligues qui jouent au même moment, ou un écart de moyenne de 30 quilles ou plus) sont listés dans <b>resultats/noms-a-verifier.csv</b>, pour que vous décidiez.</p>
+    <p class="note">Seules les ligues publiées sur Lexer sont consultées.</p>
+  </div>`;
+}
+
+// Les liens de téléchargement n'existent que sur la version en ligne.
+if (location.protocol.startsWith('http')) $('#liens').hidden = false;
+rendre();
+</script>
+</body>
+</html>

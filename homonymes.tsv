@@ -1,0 +1,6 @@
+# Homonymes : deux personnes (ou plus) qui portent le même nom dans des ligues différentes.
+# Une ligne par personne : le nom, une TABULATION, puis les ligues de cette personne séparées par des virgules.
+# Les ligues non citées appartiennent à « l'autre » personne du même nom.
+# Au tournoi, un joueur est rattaché à la personne dont une ligue correspond à son équipe.
+# Les lignes qui commencent par # sont ignorées. Exemple :
+# Serge Beaulieu	AREQ

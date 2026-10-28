@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Guide de l'utilisateur — Statistiques Inter Ligue</title>
+<style>
+  @page { size: Letter; margin: 18mm 18mm 20mm; }
+  * { box-sizing: border-box; }
+  body { font: 10.5pt/1.5 -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1d1d1f; margin: 0; }
+  h1, h2, h3 { color: #13325c; line-height: 1.2; }
+  h2 { font-size: 17pt; margin: 0 0 8pt; padding-bottom: 4pt; border-bottom: 2px solid #1f5fae; break-after: avoid; }
+  h3 { font-size: 12pt; margin: 14pt 0 4pt; break-after: avoid; }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 18pt; } li { margin-bottom: 3pt; }
+  section { margin-top: 20pt; } section.saut { break-before: page; margin-top: 0; }
+  code, .cmd { font-family: "SF Mono", Menlo, monospace; font-size: 9.5pt; }
+  code { background: #eef1f5; padding: 1pt 4pt; border-radius: 3pt; }
+  .cmd { display: block; background: #1d2433; color: #e8edf5; padding: 8pt 11pt; border-radius: 5pt; margin: 4pt 0 9pt; white-space: pre; break-inside: avoid; }
+  .encadre { background: #e8f0fa; border-left: 4px solid #1f5fae; padding: 8pt 11pt; border-radius: 0 5pt 5pt 0; margin: 8pt 0 10pt; break-inside: avoid; }
+  .attention { background: #fdf1e6; border-left-color: #c26a12; }
+  figure { margin: 6pt 0 12pt; break-inside: avoid; }
+  figure img { width: 100%; max-height: 95mm; object-fit: contain; object-position: left top; border: 1px solid #d5d8de; border-radius: 4pt; }
+  figcaption { font-size: 9pt; color: #5b5f66; margin-top: 3pt; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.5pt; margin: 4pt 0 10pt; }
+  th, td { border-bottom: 1px solid #dfe2e7; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #f1f4f8; color: #13325c; }
+  tr { break-inside: avoid; }
+  .couverture { height: 235mm; display: flex; flex-direction: column; justify-content: center; }
+  .couverture .sur { color: #1f5fae; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 10pt; }
+  .couverture h1 { font-size: 32pt; margin: 6pt 0 10pt; }
+  .couverture .sous { font-size: 14pt; color: #4a4f57; margin-bottom: 30pt; }
+  .couverture .infos { font-size: 10pt; color: #5b5f66; border-top: 1px solid #d5d8de; padding-top: 10pt; }
+  .toc li { margin-bottom: 4pt; }
+  .etapes { counter-reset: e; list-style: none; padding-left: 0; }
+  .etapes > li { counter-increment: e; position: relative; padding-left: 26pt; margin-bottom: 7pt; }
+  .etapes > li::before { content: counter(e); position: absolute; left: 0; top: 0; width: 18pt; height: 18pt; border-radius: 50%; background: #1f5fae; color: #fff; font-weight: 700; font-size: 9.5pt; text-align: center; line-height: 18pt; }
+  .k { display: inline-block; border: 1px solid #b9bec7; border-bottom-width: 2px; border-radius: 3pt; padding: 0 4pt; font-size: 9pt; background: #fafbfc; }
+  .orange { color: #a15c00; }
+</style>
+</head>
+<body>
+
+<div class="couverture">
+  <div class="sur">Salon de Quilles Montmorency</div>
+  <h1>Statistiques Inter Ligue</h1>
+  <div class="sous">Guide de l'utilisateur</div>
+  <p style="max-width:140mm">Ce logiciel relève automatiquement les résultats de tous les tournois Inter Ligue publiés sur
+  EZ Lexer / Bowl4U. Il calcule la moyenne de référence de chaque joueur à partir des ligues du salon,
+  et permet de consulter les statistiques par tournoi ou par joueur.</p>
+  <div class="infos">Version du 26 octobre 2026 · Dossier du logiciel : <code>/Users/jean-maurice/Stats Inter Ligue</code></div>
+</div>
+
+<section class="saut">
+  <h2>Table des matières</h2>
+  <ol class="toc">
+    <li>Ce que fait le logiciel</li>
+    <li>Contenu du dossier</li>
+    <li>Mettre à jour les données</li>
+    <li>Consulter le rapport — onglet Tournois</li>
+    <li>Consulter le rapport — onglet Joueur</li>
+    <li>Le fichier Excel</li>
+    <li>Interroger un joueur dans le Terminal</li>
+    <li>Comment la moyenne de référence est calculée</li>
+    <li>Ajouter un tournoi ou une ligue manuellement</li>
+    <li>Noms écrits différemment</li>
+    <li>Homonymes : même nom, personnes différentes</li>
+    <li>Limites connues et dépannage</li>
+  </ol>
+
+  <h2 style="margin-top:20pt">1. Ce que fait le logiciel</h2>
+  <p>Pour chaque tournoi dont le nom commence par « Inter Ligue », le logiciel lit sur le site de Lexer :</p>
+  <ul>
+    <li>le classement des équipes : position, moyenne déclarée de l'équipe, les 4 parties, total de quilles et différence;</li>
+    <li>la composition de chaque équipe : les joueurs qui ont joué et leurs parties;</li>
+    <li>la date et l'heure de jeu de chaque équipe.</li>
+  </ul>
+  <p>Lexer publie la moyenne déclarée de l'<b>équipe</b>, mais pas celle de chaque <b>joueur</b>. Le logiciel va donc
+  chercher la moyenne de chaque joueur dans <b>toutes les ligues du salon</b> publiées sur Lexer, telle qu'elle était à la date du
+  tournoi. C'est la <b>moyenne de référence</b> (détails à la section 8).</p>
+  <p>Il produit ensuite :</p>
+  <ul>
+    <li>un <b>rapport interactif</b> à ouvrir dans un navigateur (Safari, Chrome…);</li>
+    <li>un <b>fichier Excel</b> (format CSV) avec une ligne par joueur et par équipe;</li>
+    <li>une <b>recherche par joueur</b> directement dans le Terminal.</li>
+  </ul>
+  <div class="encadre">Le logiciel fonctionne entièrement sur votre Mac. Il ne fait que <b>lire</b> les pages publiques de résultats :
+  aucun compte, aucun mot de passe, rien n'est envoyé nulle part.</div>
+
+  <h2 style="margin-top:18pt">2. Contenu du dossier</h2>
+  <table>
+    <tr><th style="width:38%">Élément</th><th>Rôle</th></tr>
+    <tr><td><code>resultats/rapport.html</code></td><td><b>Le rapport à consulter</b> (double-clic pour l'ouvrir).</td></tr>
+    <tr><td><code>resultats/participations.csv</code></td><td>Toutes les données, à ouvrir dans Excel ou Numbers.</td></tr>
+    <tr><td><code>resultats/noms-a-verifier.csv</code></td><td>Les noms rapprochés automatiquement, ceux à confirmer (section 10) et les homonymes probables (section 11).</td></tr>
+    <tr><td><code>resultats/donnees.json</code></td><td>Données brutes (usage technique).</td></tr>
+    <tr><td><code>correspondances.tsv</code></td><td>Vos correspondances de noms entre tournoi et ligue (section 10).</td></tr>
+    <tr><td><code>homonymes.tsv</code></td><td>Vos déclarations d'homonymes : même nom, personnes différentes (section 11).</td></tr>
+    <tr><td><code>evenements.tsv</code></td><td>Liste des tournois et des ligues connus (modifiable, voir section 9).</td></tr>
+    <tr><td><code>extraire.mjs</code>, <code>lexer.mjs</code></td><td>Le programme lui-même — ne pas modifier.</td></tr>
+    <tr><td><code>rapport-modele.html</code></td><td>Gabarit du rapport — ne pas modifier.</td></tr>
+    <tr><td><code>guide/</code></td><td>Source de ce guide et script pour le régénérer.</td></tr>
+    <tr><td><code>cache/</code></td><td>Copie des pages déjà téléchargées, pour aller plus vite. Ce dossier peut être supprimé sans risque : le prochain passage sera simplement plus long.</td></tr>
+    <tr><td><code>LISEZMOI.md</code></td><td>Aide-mémoire court.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>3. Mettre à jour les données</h2>
+  <p>Faites-le après chaque nouveau tournoi Inter Ligue, ou chaque fois que vous voulez des données à jour.</p>
+  <ol class="etapes">
+    <li><b>Ouvrir le Terminal dans le dossier du logiciel.</b> Dans le Finder, faites un clic droit (ou <span class="k">control</span> + clic) sur le dossier
+    <b>Stats Inter Ligue</b>, puis choisissez <b>Services → Nouveau terminal au dossier</b>.<br>
+    <span style="color:#5b5f66">Autre méthode : ouvrez l'app <b>Terminal</b>, tapez la commande ci-dessous, puis <span class="k">retour</span>.</span>
+    <span class="cmd">cd "/Users/jean-maurice/Stats Inter Ligue"</span></li>
+    <li><b>Lancer la mise à jour</b> en tapant la commande suivante, puis <span class="k">retour</span> :
+    <span class="cmd">node extraire.mjs</span></li>
+    <li><b>Attendre le message « Terminé ».</b> Le programme affiche son avancement :
+<span class="cmd">Recherche de nouveaux événements…
+Lecture de 15 tournois Inter Ligue…
+  Inter Ligue avril 2026 : 140 équipes, 560 participations
+  …
+Lecture des ligues (saisons 2023-2024, 2024-2025, 2025-2026, 2026-2027)…
+Calcul des moyennes de référence…
+Noms écrits différemment : 48 rapprochés automatiquement, 2 à confirmer
+  (voir resultats/noms-a-verifier.csv).
+
+Terminé en 168 s — 1491 pages téléchargées, 6244 lues du cache.
+6943 participations, dont 579 sans moyenne de référence trouvée.
+Rapport : /Users/jean-maurice/Stats Inter Ligue/resultats/rapport.html</span></li>
+    <li><b>Ouvrir le rapport</b> : double-cliquez sur <code>resultats/rapport.html</code> dans le Finder. S'il était déjà ouvert, rechargez la page
+    (<span class="k">⌘</span> + <span class="k">R</span>).</li>
+  </ol>
+
+  <h3>Combien de temps ça prend?</h3>
+  <p>Le tout premier passage télécharge plusieurs milliers de pages et prend quelques minutes. Ensuite, les pages déjà lues sont
+  conservées, et seules les pages récentes (saison de ligue en cours, tournois de l'année) sont relues. Une mise à jour normale prend
+  de quelques secondes à environ 3 minutes.</p>
+
+  <h3>Les nouveaux tournois sont-ils trouvés automatiquement?</h3>
+  <p>Oui, dans la plupart des cas. À chaque mise à jour, le logiciel vérifie si un tournoi a été publié pour les derniers mois
+  (adresse du type <code>interligueoctobre2026</code>), ainsi qu'une finale de l'année. À l'automne, il cherche aussi la nouvelle saison de chaque ligue.
+  Chaque nouvel événement trouvé est signalé par une ligne « + nouvel événement trouvé ». Si un tournoi a une adresse inhabituelle, voyez la section 9.</p>
+
+  <h3>Tout retélécharger</h3>
+  <p>Si des résultats d'un ancien tournoi ont été corrigés sur Lexer après coup, forcez la relecture complète (plus long) :</p>
+  <span class="cmd">node extraire.mjs --rafraichir</span>
+
+  <div class="encadre attention"><b>Prérequis :</b> le logiciel utilise <b>Node.js</b> (version 22 ou plus récente), déjà installé sur ce Mac.
+  Si le Terminal répond « command not found: node », installez Node.js depuis <b>nodejs.org</b> (version « LTS »).
+  Une connexion Internet est nécessaire pour la mise à jour, mais pas pour consulter le rapport.</div>
+</section>
+
+<section>
+  <h2>4. Consulter le rapport — onglet Tournois</h2>
+  <p>L'onglet <b>Tournois</b> présente un tournoi à la fois. Le plus récent s'affiche à l'ouverture.</p>
+  <figure><img src="tournois.png"><figcaption>Onglet Tournois : un joueur par ligne, trié par écart.</figcaption></figure>
+
+  <h3>Les commandes</h3>
+  <ul>
+    <li><b>Liste déroulante</b> : choisir le tournoi.</li>
+    <li><b>Filtrer</b> : tapez une partie d'un nom de joueur, d'équipe ou de ligue (« kool », « tremblay »…). Les accents et
+    les majuscules ne comptent pas.</li>
+    <li><b>Trier</b> : cliquez sur l'en-tête d'une colonne; cliquez de nouveau pour inverser l'ordre.</li>
+    <li><b>Regrouper par équipe</b> : affiche les équipes dans l'ordre du classement (voir plus loin).</li>
+    <li>Cliquez sur le <b>nom d'un joueur</b> pour ouvrir sa fiche complète.</li>
+  </ul>
+
+  <h3>Le bandeau de résumé</h3>
+  <p>Il donne :</p>
+  <ul>
+    <li>la ou les dates du tournoi;</li>
+    <li>le nombre d'équipes et de joueurs;</li>
+    <li>l'<b>écart moyen</b> de tous les joueurs (moyenne jouée moins moyenne de référence);</li>
+    <li>le nombre de joueurs pour lesquels aucune moyenne de référence n'a été trouvée.</li>
+  </ul>
+
+  <h3>Les colonnes</h3>
+  <table>
+    <tr><th style="width:28%">Colonne</th><th>Signification</th></tr>
+    <tr><td>Ligue représentée</td><td>La ligue inscrite dans le nom de l'équipe (ex. « Super Kool » pour « Super Kool (Lynda) »).</td></tr>
+    <tr><td>Équipe(s)</td><td>Équipe(s) du joueur dans ce tournoi, avec leur position au classement. Un joueur peut jouer pour plusieurs équipes.</td></tr>
+    <tr><td>Parties</td><td>Nombre de parties jouées dans le tournoi, toutes équipes confondues.</td></tr>
+    <tr><td>Moy. réf.</td><td>Moyenne de référence, tronquée à l'entier (section 8).</td></tr>
+    <tr><td>Moy. jouée</td><td>Moyenne réellement jouée dans le tournoi.</td></tr>
+    <tr><td>Écart</td><td>Moy. jouée − Moy. réf. En <span style="color:#1d7a3e">vert</span> : au-dessus de sa moyenne; en <span style="color:#b3261e">rouge</span> : en dessous.</td></tr>
+    <tr><td>Source de la référence</td><td>Ligue et saison d'où vient la moyenne de référence, nombre de parties de ligue retenues et méthode
+    (« à la date » ou « saison précédente »). La mention <span class="orange">≈ en ligue sous le nom « … »</span> s'ajoute quand le nom
+    diffère entre le tournoi et la ligue (section 10). « <span style="color:#b3261e">introuvable</span> » signifie qu'aucune ligue ne convient.</td></tr>
+  </table>
+
+  <h3>Vue « Regrouper par équipe »</h3>
+  <p>Cochez <b>Regrouper par équipe</b> pour voir chaque équipe dans l'ordre du classement, avec ses joueurs.</p>
+  <figure><img src="equipe.png"><figcaption>Vue par équipe : le résultat de l'équipe et le contrôle de la moyenne déclarée.</figcaption></figure>
+  <p>La ligne de titre de chaque équipe indique :</p>
+  <ul>
+    <li>la date et l'heure de jeu, les 4 parties de l'équipe et son total;</li>
+    <li>la <b>moyenne déclarée de l'équipe</b> (publiée par Lexer) et la <b>différence</b> obtenue (total moins 4 fois la moyenne);</li>
+    <li>la <b>somme des moyennes de référence</b> des joueurs, calculée par le logiciel.</li>
+  </ul>
+  <div class="encadre"><b>Contrôle de la moyenne déclarée.</b> Quand la somme des moyennes de référence ne correspond pas à la moyenne déclarée
+  de l'équipe, l'écart est affiché en rouge, par exemple « (+33 vs déclarée) ». Un petit écart de quelques quilles est normal, car la
+  date exacte utilisée pour les moyennes peut différer d'une semaine. Un grand écart positif signale souvent un joueur qui a une
+  moyenne plus haute dans une autre ligue que celle déclarée pour l'équipe.</div>
+  <p>Sur l'ensemble des tournois, la somme calculée tombe à 4 quilles près de la moyenne déclarée pour environ 3 équipes sur 4,
+  et à moins de 20 quilles pour 98 % des équipes.</p>
+</section>
+
+<section>
+  <h2>5. Consulter le rapport — onglet Joueur</h2>
+  <p>L'onglet <b>Joueur</b> rassemble toutes les statistiques d'un joueur sur l'ensemble des tournois Inter Ligue.</p>
+  <h3>Chercher un joueur</h3>
+  <p>Tapez quelques lettres du prénom ou du nom, puis cliquez sur le bon nom dans la liste. Vous pouvez aussi cliquer sur un nom dans l'onglet Tournois.</p>
+  <figure style="width:70%"><img src="recherche.png"><figcaption>Recherche : « pell » trouve tous les Pelletier.</figcaption></figure>
+  <h3>La fiche du joueur</h3>
+  <figure><img src="joueur.png"><figcaption>Fiche d'un joueur : résumé, puis une ligne par participation, de la plus récente à la plus ancienne.</figcaption></figure>
+  <ul>
+    <li><b>Résumé</b> : nombre de tournois et de participations (un joueur qui joue pour 2 équipes au même tournoi compte 2 participations),
+    nombre de parties, moyenne jouée sur tous les tournois, meilleure partie, écart moyen par rapport à la référence, et ligues représentées.</li>
+    <li><b>Une ligne par participation</b> : date, tournoi, équipe, parties jouées, moyenne de référence et sa source,
+    moyenne jouée, écart et <b>résultat de l'équipe</b> (position sur le nombre d'équipes, total, moyenne déclarée de l'équipe, différence).</li>
+    <li>Sous la source, la mention « autres : … » donne les moyennes du joueur dans ses autres ligues, quand il en a plusieurs.</li>
+  </ul>
+  <p class="encadre">Le rapport mémorise le dernier onglet, tournoi et joueur consultés : vous les retrouvez à la prochaine ouverture.</p>
+
+  <h2 style="margin-top:20pt">6. Le fichier Excel</h2>
+  <p>Le fichier <code>resultats/participations.csv</code> contient une ligne par joueur et par équipe, pour tous les tournois. Il s'ouvre
+  directement dans Excel (double-clic), avec les accents et les décimales à la française. Dans Numbers : <b>Fichier → Ouvrir</b>.</p>
+  <table>
+    <tr><th style="width:34%">Colonne</th><th>Contenu</th></tr>
+    <tr><td>Tournoi, Date</td><td>Nom du tournoi et date de jeu de l'équipe (AAAA-MM-JJ).</td></tr>
+    <tr><td>Équipe, Ligue (équipe)</td><td>Nom complet de l'équipe et ligue représentée.</td></tr>
+    <tr><td>Pos. équipe, Moy. équipe déclarée, Total équipe, Diff. équipe</td><td>Résultat de l'équipe.</td></tr>
+    <tr><td>Somme des moy. de référence</td><td>Somme calculée pour les joueurs de l'équipe (vide si un joueur n'a pas de référence).</td></tr>
+    <tr><td>Joueur, Parties, Quilles, Moyenne jouée</td><td>Performance du joueur avec cette équipe.</td></tr>
+    <tr><td>Moyenne de référence, Écart</td><td>Moyenne de référence (entière) et écart (jouée − référence).</td></tr>
+    <tr><td>Ligue de référence, Saison, Parties en ligue, Méthode</td><td>D'où vient la moyenne de référence.</td></tr>
+    <tr><td>Nom en ligue (si différent)</td><td>Nom sous lequel le joueur a été trouvé en ligue, et le type de rapprochement : automatique ou manuel.</td></tr>
+    <tr><td>Autres ligues</td><td>Moyennes du joueur dans ses autres ligues admissibles.</td></tr>
+  </table>
+  <p>Astuce : dans Excel, sélectionnez la ligne d'en-tête et choisissez <b>Données → Filtrer</b> pour trier et filtrer
+  par tournoi, ligue ou joueur. Vous pouvez aussi créer un tableau croisé dynamique, par exemple pour l'écart moyen par ligue.</p>
+</section>
+
+<section>
+  <h2>7. Interroger un joueur dans le Terminal</h2>
+  <p>Sans ouvrir le rapport, vous pouvez afficher les statistiques d'un joueur. Le Terminal doit être ouvert dans le dossier du logiciel (voir section 3) :</p>
+  <span class="cmd">node extraire.mjs joueur "Guy Pelletier"</span>
+  <p>Une partie du nom suffit : « pelletier » affiche tous les Pelletier. Exemple de réponse :</p>
+<span class="cmd">Guy Pelletier — 15 tournois, 220 parties, moyenne jouée 194.96
+  2024-10-20  Inter Ligue Octobre 2024   CCM Subaru (G. Pelletier 2)   jouée 183.25
+              réf. 198 (CCM Subaru 2024-2025, à la date) écart -14.75
+      équipe : 30e, 3274 quilles, moy. déclarée 809, diff. +38
+  …</span>
+  <p>Cette commande utilise les données de la dernière mise à jour. Elle ne télécharge rien.</p>
+</section>
+
+<section>
+  <h2>8. Comment la moyenne de référence est calculée</h2>
+  <p>Comme Lexer ne publie pas la moyenne déclarée de chaque joueur, le logiciel l'établit à partir des ligues du Salon de Quilles
+  Montmorency publiées sur Lexer, selon la règle suivante :</p>
+  <ol class="etapes">
+    <li><b>Saison en cours.</b> Pour chaque ligue de la saison en cours au moment du tournoi (une saison va d'août à juillet), le logiciel
+    calcule la moyenne cumulative du joueur <b>avant la première journée du tournoi</b>, à partir de sa fiche semaine par semaine.</li>
+    <li><b>Minimum de 20 parties.</b> Seules les ligues où le joueur avait <b>au moins 20 parties</b> à cette date sont retenues. Parmi elles, on garde
+    <b>la plus haute moyenne</b>. La méthode affichée est alors « à la date ».</li>
+    <li><b>Sinon, saison précédente.</b> Si aucune ligue de la saison en cours n'atteint 20 parties (typiquement en début de saison),
+    on prend la plus haute moyenne <b>finale</b> de la saison précédente, toujours avec au moins 20 parties. La méthode affichée est alors « saison précédente ».</li>
+    <li><b>Sinon, introuvable.</b> Si rien ne convient, la moyenne de référence est « introuvable » et l'écart n'est pas calculé.</li>
+  </ol>
+  <p>La moyenne retenue est <b>tronquée à l'entier</b> (197,86 devient 197), comme une moyenne de ligue. L'écart = moyenne jouée au tournoi − moyenne de référence.</p>
+  <p>Le joueur est recherché dans les ligues sous son nom exact (sans tenir compte des accents ni des majuscules). Si ce nom n'existe pas,
+  le logiciel essaie un nom proche (section 10).</p>
+  <div class="encadre"><b>Exemple (chiffres fictifs).</b> Un joueur joue l'Inter Ligue du 12 avril 2026. Avant le 12 avril, il avait 96 parties à 162,4 dans
+  Les Québécois et 15 parties à 170,1 dans Énergizer. Énergizer est écarté, car il a moins de 20 parties. Sa moyenne de référence est donc 162
+  (Les Québécois, 2025-2026, à la date). S'il joue 4 parties pour 789 quilles, sa moyenne jouée est 197,25 et son écart +35,25.</div>
+  <p>L'onglet <b>Méthode</b> du rapport rappelle cette règle.</p>
+
+  <h2 style="margin-top:20pt">9. Ajouter un tournoi ou une ligue manuellement</h2>
+  <p>La liste des événements connus se trouve dans <code>evenements.tsv</code>. Ouvrez-la avec <b>TextEdit</b> (clic droit → Ouvrir avec → TextEdit).
+  Chaque ligne contient trois éléments séparés par une <b>tabulation</b> :</p>
+<span class="cmd">Inter Ligue Novembre 2026	interliguenovembre2026	interligue
+Énergizer (2027-2028)	energizer2027-2028	ligue</span>
+  <table>
+    <tr><th style="width:22%">Élément</th><th>Description</th></tr>
+    <tr><td>Nom</td><td>Le nom affiché dans le rapport.</td></tr>
+    <tr><td>Adresse</td><td>La fin de l'adresse des résultats sur Lexer (voir ci-dessous).</td></tr>
+    <tr><td>Type</td><td><code>interligue</code> pour un tournoi Inter Ligue, <code>ligue</code> pour une saison de ligue (utilisée pour les moyennes),
+    <code>autre</code> pour un événement à ignorer.</td></tr>
+  </table>
+  <h3>Trouver l'adresse d'un événement</h3>
+  <ol class="etapes">
+    <li>Sur <b>bowl4u.com</b>, ouvrez la page de résultats du Salon de Quilles Montmorency.</li>
+    <li>Faites un clic droit sur le bouton <b>Résultats</b> de l'événement, puis choisissez <b>Copier le lien</b>.</li>
+    <li>Le lien ressemble à <code>https://bowling.lexerbowling.com/salondequillesmontmorency/<b>interligueavril2026</b></code>.
+    L'adresse à inscrire est la dernière partie, en gras.</li>
+  </ol>
+  <p>Enregistrez le fichier, puis relancez <code>node extraire.mjs</code>.</p>
+  <div class="encadre attention">Le nom d'une ligue doit contenir sa saison, par exemple « (2027-2028) ». Sinon, mettez la saison dans l'adresse.
+  Le logiciel s'en sert pour savoir à quelle saison appartiennent les moyennes.</div>
+</section>
+
+<section>
+  <h2>10. Noms écrits différemment</h2>
+  <p>Il arrive qu'un joueur soit écrit d'une façon au tournoi et d'une autre dans sa ligue : « Chrisitan Mercier » au lieu de
+  « Christian Mercier », « Pier-Olivier » au lieu de « Pierre-Olivier », « Richard Lapointe (Bot) » au lieu de « Richard Lapointe ».
+  Le logiciel gère ces cas de deux façons.</p>
+
+  <h3>1) Le rapprochement automatique</h3>
+  <p>Quand le nom du tournoi n'existe pas tel quel dans les ligues, le logiciel cherche un nom <b>très proche</b> :</p>
+  <ul>
+    <li>Le nom doit différer d'une ou deux lettres au plus (une seule pour les noms courts).</li>
+    <li>Si plusieurs noms proches existent, il préfère celui qui figure dans la <b>ligue que représente l'équipe</b>. Il ne retient le nom que s'il ne reste qu'un seul candidat.</li>
+    <li>Pour un nom avec une <b>précision entre parenthèses</b> (« Pierre Dube (Joker) », « Claude Aubin (PT) »), qui sert souvent à distinguer des homonymes,
+    seules comptent la ligue désignée par la précision (Joker → Les Jokers, PT → Passe-Temps, Bot → Bottines Roulantes, Ret → Retraités…)
+    et la ligue de l'équipe.</li>
+  </ul>
+  <p>Dans le rapport, la source de la référence porte alors la mention <span class="orange">≈ en ligue sous le nom « … » (rapprochement automatique, à vérifier)</span> :</p>
+  <figure><img src="rapproche.png"><figcaption>Rapprochement automatique : « Pier-Olivier Trudel » au tournoi, « Pierre-Olivier Trudel » en ligue.</figcaption></figure>
+
+  <h3>2) Le fichier des cas à vérifier</h3>
+  <p>À chaque mise à jour, le fichier <code>resultats/noms-a-verifier.csv</code> (à ouvrir dans Excel) liste les noms concernés, avec un statut :</p>
+  <table>
+    <tr><th style="width:32%">Statut</th><th>Signification et action</th></tr>
+    <tr><td>rapproché automatiquement</td><td>Le logiciel a trouvé le joueur sous un autre nom. Vérifiez rapidement que c'est la bonne personne.
+    Si c'est une erreur, bloquez le rapprochement (voir plus bas).</td></tr>
+    <tr><td>rapproché, moins de 20 parties</td><td>Le joueur a bien été trouvé, mais il n'avait pas 20 parties. Aucune action n'est nécessaire.</td></tr>
+    <tr><td>à confirmer</td><td>Plusieurs noms proches existent, et le logiciel ne sait pas lequel choisir. Indiquez le bon dans <code>correspondances.tsv</code>.</td></tr>
+    <tr><td>homonyme probable</td><td>Le même nom figure dans des ligues qui suggèrent deux personnes différentes (section 11).</td></tr>
+  </table>
+
+  <h3>3) Le fichier de correspondances (à remplir vous-même)</h3>
+  <p>Le fichier <code>correspondances.tsv</code>, dans le dossier du logiciel, vous permet d'imposer une correspondance. Ouvrez-le avec <b>TextEdit</b>.
+  Écrivez une ligne par joueur : le nom tel qu'il est écrit <b>au tournoi</b>, une <b>tabulation</b>, puis le nom tel qu'il est écrit <b>dans la ligue</b>.</p>
+<span class="cmd">Claude Aubin (PT)	Claude Aubin
+Keven Lessard	Kevin Lessard
+Claude Aubin (mixte)	</span>
+  <ul>
+    <li>Une correspondance inscrite dans ce fichier a <b>toujours priorité</b> sur le rapprochement automatique. Dans le rapport, elle apparaît
+    comme « correspondance manuelle ».</li>
+    <li>Pour <b>bloquer</b> un rapprochement automatique erroné, laissez le nom en ligue vide : écrivez le nom au tournoi suivi d'une tabulation seulement
+    (troisième ligne de l'exemple).</li>
+    <li>Les lignes qui commencent par <code>#</code> sont des commentaires et sont ignorées.</li>
+    <li>Les accents et les majuscules ne comptent pas, mais l'orthographe doit être exacte. Copiez les noms depuis
+    <code>noms-a-verifier.csv</code> ou depuis le rapport pour éviter les fautes.</li>
+  </ul>
+  <p>Enregistrez le fichier, puis relancez <code>node extraire.mjs</code> (quelques secondes, tout vient du cache).</p>
+  <div class="encadre">Quand un joueur est rapproché, ses participations sous les deux orthographes sont regroupées dans une seule fiche de l'onglet <b>Joueur</b>.
+  Les noms avec une précision entre parenthèses restent des fiches distinctes, puisqu'ils désignent souvent des personnes différentes.</div>
+</section>
+
+<section>
+  <h2>11. Homonymes : même nom, personnes différentes</h2>
+  <p>Lexer ne donne aucun identifiant de joueur, seulement son nom. Par défaut, un même nom présent dans plusieurs ligues est donc considéré comme
+  <b>une seule personne</b>, et la plus haute de ses moyennes est retenue. C'est le bon choix dans la grande majorité des cas, car beaucoup de joueurs
+  jouent dans plusieurs ligues. Quand deux personnes différentes portent le même nom, il faut l'indiquer au logiciel.</p>
+
+  <h3>1) La détection automatique des homonymes probables</h3>
+  <p>À chaque mise à jour, le logiciel signale dans <code>resultats/noms-a-verifier.csv</code>, avec le statut <b>homonyme probable</b>,
+  les noms de joueurs des tournois qui présentent l'un de ces indices (colonne <b>Détail</b>) :</p>
+  <ul>
+    <li><b>Horaires en conflit</b> : le nom figure dans deux ligues qui jouent le même jour à moins de 2 h 30 d'intervalle (par exemple deux ligues
+    du lundi à 18 h 50). Une même personne ne peut pas jouer dans les deux. C'est un indice fort. Les remplaçants occasionnels (moins de 6 parties) sont ignorés.</li>
+    <li><b>Écart de moyenne</b> : 30 quilles ou plus entre deux ligues de la même saison, par exemple 120 à l'AREQ et 207 ailleurs. C'est un indice moins sûr :
+    vérifiez avant de déclarer.</li>
+  </ul>
+  <p>Le logiciel ne sépare <b>rien de lui-même</b>. Il signale seulement les cas probables, et c'est vous qui décidez.</p>
+
+  <h3>2) Le fichier homonymes.tsv (à remplir vous-même)</h3>
+  <p>Ouvrez <code>homonymes.tsv</code> avec <b>TextEdit</b>. Chaque ligne décrit <b>une personne</b> : son nom, une <b>tabulation</b>, puis ses ligues
+  séparées par des virgules.</p>
+<span class="cmd">Serge Beaulieu	AREQ
+Richard Lapointe	Bottines Roulantes, Métaux Multi-Plis, Pierrafeux</span>
+  <ul>
+    <li>La première ligne veut dire : le Serge Beaulieu de l'AREQ est une autre personne que le Serge Beaulieu des autres ligues.</li>
+    <li>Les ligues <b>non citées</b> appartiennent à « l'autre » personne du même nom. Une seule ligne suffit donc pour deux personnes.
+    Pour trois personnes ou plus, écrivez une ligne par personne.</li>
+    <li>Les noms de ligues peuvent être abrégés comme dans les noms d'équipes (« Pierrafeux » pour « Les Pierrafeux »), sans la saison.</li>
+  </ul>
+  <h3>Ce que ça change</h3>
+  <ul>
+    <li>Au tournoi, le joueur est rattaché à la personne dont une ligue correspond à son équipe (ou à sa précision entre parenthèses, par exemple « (Bot) »).
+    Sinon, il est rattaché à « l'autre » personne.</li>
+    <li>Sa moyenne de référence ne vient que des ligues de cette personne.</li>
+    <li>Dans le rapport, la personne déclarée a sa propre fiche, affichée avec ses ligues : « Richard Lapointe [Bottines Roulantes, Métaux Multi-Plis, Pierrafeux] ».</li>
+  </ul>
+  <p>Enregistrez le fichier, puis relancez <code>node extraire.mjs</code>.</p>
+  <div class="encadre attention">Ne déclarez un homonyme qu'en cas de certitude. Séparer à tort une même personne en deux fiches lui ferait perdre
+  la moyenne de ses autres ligues.</div>
+</section>
+
+<section>
+  <h2>12. Limites connues et dépannage</h2>
+  <h3>Pourquoi certains joueurs n'ont pas de moyenne de référence?</h3>
+  <ul>
+    <li><b>Inter Ligue Finale 2024</b> : ce tournoi a été joué en avril 2024 (saison 2023-2024). Les ligues ne sont publiées sur Lexer qu'à partir
+    de la saison 2024-2025, donc aucun joueur de ce tournoi n'a de moyenne de référence.</li>
+    <li><b>Inter Ligue Octobre 2024</b> : en début de saison, plusieurs joueurs n'avaient pas encore 20 parties, et la saison précédente
+    (2023-2024) n'est pas publiée.</li>
+    <li>Le joueur ne joue dans aucune ligue publiée sur Lexer, ou il y a moins de 20 parties.</li>
+    <li>Son nom est trop différent entre le tournoi et la ligue pour être rapproché automatiquement. Ajoutez-le à <code>correspondances.tsv</code> (section 10).</li>
+  </ul>
+  <h3>Homonymes non déclarés</h3>
+  <p>Tant qu'ils ne sont pas déclarés dans <code>homonymes.tsv</code> (section 11), deux personnes du même nom sont confondues, et la plus haute de leurs
+  moyennes pourrait être retenue. En cas de doute, la colonne <b>Source de la référence</b> indique la ligue utilisée.</p>
+
+  <h3>Messages d'erreur</h3>
+  <table>
+    <tr><th style="width:38%">Message</th><th>Que faire</th></tr>
+    <tr><td><code>command not found: node</code></td><td>Installer Node.js depuis nodejs.org (version LTS).</td></tr>
+    <tr><td><code>ENOENT … evenements.tsv</code></td><td>Le Terminal n'est pas dans le bon dossier : refaire l'étape 1 de la section 3.</td></tr>
+    <tr><td><code>fetch failed</code> ou <code>HTTP 5xx</code></td><td>Problème de connexion, ou site Lexer indisponible : réessayer plus tard. Les pages déjà en cache ne sont pas perdues.</td></tr>
+    <tr><td><code>! … pages introuvables</code></td><td>L'adresse inscrite dans <code>evenements.tsv</code> est erronée, ou l'événement a été retiré de Lexer.</td></tr>
+    <tr><td>Le rapport ne montre pas le dernier tournoi</td><td>Relancer <code>node extraire.mjs</code>, puis recharger le rapport (<span class="k">⌘</span> + <span class="k">R</span>). Si le tournoi n'est toujours pas trouvé, l'ajouter à la main (section 9).</td></tr>
+    <tr><td>Une correspondance n'est pas prise en compte</td><td>Vérifier que les deux noms sont séparés par une <b>tabulation</b> (pas des espaces) et que le nom au tournoi est écrit exactement comme dans le rapport.</td></tr>
+  </table>
+
+  <h3>Résumé des commandes</h3>
+  <table>
+    <tr><th style="width:45%">Commande</th><th>Effet</th></tr>
+    <tr><td><code>node extraire.mjs</code></td><td>Met à jour les données et régénère le rapport et les fichiers Excel.</td></tr>
+    <tr><td><code>node extraire.mjs --rafraichir</code></td><td>Même chose, en retéléchargeant toutes les pages.</td></tr>
+    <tr><td><code>node extraire.mjs joueur "Nom"</code></td><td>Affiche les statistiques d'un joueur dans le Terminal.</td></tr>
+    <tr><td><code>zsh guide/generer-guide.sh</code></td><td>Régénère ce guide (captures et PDF) à partir des données actuelles.</td></tr>
+  </table>
+</section>
+
+</body>
+</html>
